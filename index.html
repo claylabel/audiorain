@@ -119,11 +119,7 @@ function updateTrackTitle() {
 widget.bind(SC.Widget.Events.PLAY, updateTrackTitle);
 updateTrackTitle();
 
-// Tap-to-play overlay voor iOS
-const overlay = document.getElementById('play-overlay');
-overlay.addEventListener('click', () => {
-    widget.play();
-    overlay.style.display = 'none';
+
 });
 </script>
 
