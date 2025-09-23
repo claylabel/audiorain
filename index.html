@@ -18,6 +18,7 @@
     user-select: none;
     color: black;
     font-family: Garamond, "Adobe Garamond Pro", serif;
+    max-height: calc(100vh - 300px); /* Vallende woorden stoppen boven de player */
   }
   .soundcloud-player {
     position: fixed;
@@ -34,31 +35,23 @@
 
 <iframe id="sc-player" class="soundcloud-player"
         scrolling="no" frameborder="no" allow="autoplay"
-        src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/soundcloud%3Aplaylists%3A2084128677%3Fsecret_token%3Ds-rYOfCXSLdxy&color=%23ff5500&auto_play=true&hide_related=false&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=true">
+        src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/soundcloud%3Aplaylists%3A2084128677%3Fsecret_token%3Ds-rYOfCXSLdxy&color=%23ff5500&auto_play=true&hide_related=false&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=false">
 </iframe>
 
 <script src="https://w.soundcloud.com/player/api.js"></script>
 <script>
 let currentTitle = "audio";
-const aantal = 69; // aantal vallende woorden
+const aantal = 69;
 const namenArray = [];
-
 const windowWidth = window.innerWidth;
 const windowHeight = window.innerHeight;
 
-// Willekeurige grootte, kleine woorden veel vaker
+// Willekeurige grootte, kleine woorden dominant
 function getRandomFontSize() {
-    const smallMin = 22;
-    const smallMax = 40;
-    const largeMin = 41;
-    const largeMax = 280;
-
-    const chance = Math.random();
-    if (chance < 0.85) { // 85% kans op klein woord
-        return Math.round(smallMin + Math.random() * (smallMax - smallMin));
-    } else { // 15% kans op groot woord
-        return Math.round(largeMin + Math.random() * (largeMax - largeMin));
-    }
+    const rand = Math.random();
+    if (rand < 0.90) return Math.round(22 + Math.random() * (40 - 22)); // kleine
+    else if (rand < 0.99) return Math.round(41 + Math.random() * (280 - 41)); // middelgrote
+    else return 400; // mega zeldzaam
 }
 
 function createNaam() {
@@ -82,14 +75,12 @@ function animate() {
     for (const n of namenArray) {
         let top = parseFloat(n.style.top) || 0;
         top += n.speed;
-
-        if (top > windowHeight) {
+        if (top > windowHeight - 300) { // stopt net boven de player
             top = -50;
             n.style.left = Math.random() * windowWidth + "px";
             n.textContent = currentTitle;
             n.style.fontSize = getRandomFontSize() + "px";
         }
-
         n.style.top = top + "px";
     }
     requestAnimationFrame(animate);
@@ -103,9 +94,7 @@ const widget = SC.Widget(iframeElement);
 
 function updateTrackTitle() {
     widget.getCurrentSound(function(sound) {
-        if (sound && sound.title) {
-            currentTitle = sound.title;
-        }
+        if (sound && sound.title) currentTitle = sound.title;
     });
 }
 
