@@ -18,7 +18,7 @@
     user-select: none;
     color: black;
     font-family: Garamond, "Adobe Garamond Pro", serif;
-    max-height: calc(100vh - 300px); /* Vallende woorden stoppen boven de player */
+    max-height: calc(100vh - 300px); /* vallende woorden stoppen boven de player */
   }
   .soundcloud-player {
     position: fixed;
@@ -29,24 +29,40 @@
     border: none;
     z-index: 1000;
   }
+  #play-overlay {
+    position: fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background: rgba(255,255,255,0.01); /* bijna transparant */
+    z-index:2000;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:24px;
+    cursor:pointer;
+  }
 </style>
 </head>
 <body>
 
 <iframe id="sc-player" class="soundcloud-player"
         scrolling="no" frameborder="no" allow="autoplay"
-        src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/soundcloud%3Aplaylists%3A2084128677%3Fsecret_token%3Ds-rYOfCXSLdxy&color=%23ff5500&auto_play=true&hide_related=false&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=false">
+        src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/soundcloud%3Aplaylists%3A2084128677%3Fsecret_token%3Ds-rYOfCXSLdxy&color=%23ff5500&auto_play=true&hide_related=false&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=true">
 </iframe>
+
+<div id="play-overlay">Tap to start audio</div>
 
 <script src="https://w.soundcloud.com/player/api.js"></script>
 <script>
 let currentTitle = "audio";
-const aantal = 69;
+const aantal = 69; 
 const namenArray = [];
 const windowWidth = window.innerWidth;
 const windowHeight = window.innerHeight;
 
-// Willekeurige grootte, kleine woorden dominant
+// Willekeurige grootte, met zeer veel kleine woorden
 function getRandomFontSize() {
     const rand = Math.random();
     if (rand < 0.90) return Math.round(22 + Math.random() * (40 - 22)); // kleine
@@ -100,6 +116,13 @@ function updateTrackTitle() {
 
 widget.bind(SC.Widget.Events.PLAY, updateTrackTitle);
 updateTrackTitle();
+
+// Tap-to-play overlay voor iOS
+const overlay = document.getElementById('play-overlay');
+overlay.addEventListener('click', () => {
+    widget.play();
+    overlay.style.display = 'none';
+});
 </script>
 
 </body>
