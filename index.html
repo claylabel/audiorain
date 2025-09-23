@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dynamische Audio Regen</title>
+<style>
+  body {
+    margin: 0;
+    background: white;
+    overflow: hidden;
+    font-family: Garamond, "Adobe Garamond Pro", serif;
+    color: black;
+  }
+  .naam {
+    position: absolute;
+    white-space: nowrap;
+    user-select: none;
+    color: black;
+    font-family: Garamond, "Adobe Garamond Pro", serif;
+  }
+  .soundcloud-player {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 500px;
+    height: 300px;
+    border: none;
+    z-index: 1000;
+  }
+</style>
+</head>
+<body>
+
+<iframe id="sc-player" class="soundcloud-player"
+        scrolling="no" frameborder="no" allow="autoplay"
+        src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/soundcloud%3Aplaylists%3A2084128677%3Fsecret_token%3Ds-rYOfCXSLdxy&color=%23ff5500&auto_play=true&hide_related=false&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=true">
+</iframe>
+
+<script src="https://w.soundcloud.com/player/api.js"></script>
+<script>
+let currentTitle = "audio";
+const aantal = 69; // aantal vallende woorden
+const namenArray = [];
+
+const windowWidth = window.innerWidth;
+const windowHeight = window.innerHeight;
+
+// Willekeurige grootte, kleine woorden veel vaker
+function getRandomFontSize() {
+    const smallMin = 22;
+    const smallMax = 40;
+    const largeMin = 41;
+    const largeMax = 280;
+
+    const chance = Math.random();
+    if (chance < 0.85) { // 85% kans op klein woord
+        return Math.round(smallMin + Math.random() * (smallMax - smallMin));
+    } else { // 15% kans op groot woord
+        return Math.round(largeMin + Math.random() * (largeMax - largeMin));
+    }
+}
+
+function createNaam() {
+    const el = document.createElement("div");
+    el.classList.add("naam");
+    el.textContent = currentTitle;
+    el.style.left = Math.random() * windowWidth + "px";
+    el.style.top = -Math.random() * 200 + "px";
+    el.style.fontSize = getRandomFontSize() + "px";
+    el.speed = 1 + Math.random() * 3;
+    document.body.appendChild(el);
+    return el;
+}
+
+// Maak vallende woorden
+for (let i = 0; i < aantal; i++) {
+    namenArray.push(createNaam());
+}
+
+function animate() {
+    for (const n of namenArray) {
+        let top = parseFloat(n.style.top) || 0;
+        top += n.speed;
+
+        if (top > windowHeight) {
+            top = -50;
+            n.style.left = Math.random() * windowWidth + "px";
+            n.textContent = currentTitle;
+            n.style.fontSize = getRandomFontSize() + "px";
+        }
+
+        n.style.top = top + "px";
+    }
+    requestAnimationFrame(animate);
+}
+
+animate();
+
+// SoundCloud API
+const iframeElement = document.getElementById('sc-player');
+const widget = SC.Widget(iframeElement);
+
+function updateTrackTitle() {
+    widget.getCurrentSound(function(sound) {
+        if (sound && sound.title) {
+            currentTitle = sound.title;
+        }
+    });
+}
+
+widget.bind(SC.Widget.Events.PLAY, updateTrackTitle);
+updateTrackTitle();
+</script>
+
+</body>
+</html>
