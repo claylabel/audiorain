@@ -75,9 +75,9 @@ function animate() {
         let top = parseFloat(n.style.top) || 0;
         top += n.speed;
 
-        // Laat woorden helemaal tot beneden vallen (ook over de player)
+        // Woorden kunnen nu helemaal tot beneden vallen (over de player)
         if (top > windowHeight) {
-            top = -50;
+            top = -50; // reset bovenaan
             n.style.left = Math.random() * windowWidth + "px";
             n.textContent = currentTitle;
             n.style.fontSize = getRandomFontSize() + "px"; // nieuwe grootte
