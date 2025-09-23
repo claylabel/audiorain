@@ -42,23 +42,15 @@
 let currentTitle = "audio";
 const aantal = 69; // aantal vallende woorden
 const namenArray = [];
-
 const windowWidth = window.innerWidth;
 const windowHeight = window.innerHeight;
 
-// Willekeurige grootte, kleine woorden veel vaker
+// Willekeurige grootte, kleine woorden veel vaker, mega zeldzaam 400px
 function getRandomFontSize() {
-    const smallMin = 22;
-    const smallMax = 40;
-    const largeMin = 41;
-    const largeMax = 280;
-
-    const chance = Math.random();
-    if (chance < 0.85) { // 85% kans op klein woord
-        return Math.round(smallMin + Math.random() * (smallMax - smallMin));
-    } else { // 15% kans op groot woord
-        return Math.round(largeMin + Math.random() * (largeMax - largeMin));
-    }
+    const rand = Math.random();
+    if (rand < 0.80) return Math.round(22 + Math.random() * (40 - 22)); // kleine
+    else if (rand < 0.99) return Math.round(41 + Math.random() * (280 - 41)); // middel
+    else return 400; // mega zeldzaam
 }
 
 function createNaam() {
@@ -82,14 +74,12 @@ function animate() {
     for (const n of namenArray) {
         let top = parseFloat(n.style.top) || 0;
         top += n.speed;
-
         if (top > windowHeight) {
             top = -50;
             n.style.left = Math.random() * windowWidth + "px";
             n.textContent = currentTitle;
             n.style.fontSize = getRandomFontSize() + "px";
         }
-
         n.style.top = top + "px";
     }
     requestAnimationFrame(animate);
@@ -103,14 +93,23 @@ const widget = SC.Widget(iframeElement);
 
 function updateTrackTitle() {
     widget.getCurrentSound(function(sound) {
-        if (sound && sound.title) {
-            currentTitle = sound.title;
-        }
+        if (sound && sound.title) currentTitle = sound.title;
     });
 }
 
 widget.bind(SC.Widget.Events.PLAY, updateTrackTitle);
 updateTrackTitle();
+
+// Auto play fallback bij browserrestricties
+function tryPlayWidget() {
+    widget.play();
+    document.body.removeEventListener('click', tryPlayWidget);
+    document.body.removeEventListener('touchstart', tryPlayWidget);
+}
+
+// Start player na eerste interactie
+document.body.addEventListener('click', tryPlayWidget);
+document.body.addEventListener('touchstart', tryPlayWidget);
 </script>
 
 </body>
